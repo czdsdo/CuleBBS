@@ -3,7 +3,7 @@ package com.example.admin.config;
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 import com.example.admin.service.PermissionService;
 
-import com.example.admin.shiro.MyshiroRealm;
+import com.quark.admin.shiro.MyshiroRealm ;
 import com.example.common.entity.Permission;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;

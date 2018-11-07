@@ -1,4 +1,5 @@
-package com.example.admin.shiro;
+package com.quark.admin.shiro;
+
 
 import com.example.admin.service.AdminUserService;
 import com.example.admin.service.PermissionService;
@@ -16,15 +17,19 @@ import org.apache.shiro.util.ByteSource;
 import javax.annotation.Resource;
 import java.util.List;
 
+/**
+ * Created by lhr on 17-8-1.
+ */
 public class MyshiroRealm extends AuthorizingRealm {
+
     @Resource
     private AdminUserService adminUserService;
+
     @Resource
     private PermissionService permissionService;
 
     /**
      * 授权
-     *
      * @param principalCollection
      * @return
      */
@@ -32,27 +37,38 @@ public class MyshiroRealm extends AuthorizingRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         Integer id = (Integer) principalCollection.getPrimaryPrincipal();
         List<Permission> permissionList = permissionService.loadUserPermission(id);
+        // 权限信息对象info,用来存放查出的用户的所有的角色（role）及权限（permission）
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-        permissionList.forEach(p -> info.addStringPermission(p.getPerurl()));
+
+        permissionList.forEach(p->info.addStringPermission(p.getPerurl()));
         return info;
     }
 
     /**
-     *
+     * 认证
+     * @param token
+     * @return
+     * @throws AuthenticationException
      */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-        String username = (String) token.getPrincipal();
+        //获取用户的输入的账号.
+        String username = (String)token.getPrincipal();
         AdminUser user = adminUserService.findByUserName(username);
-        if (null == user) throw new UnknownAccountException();
-        if (0 == user.getEnable()) {
-            throw new LockedAccountException();
+        if(user==null) throw new UnknownAccountException();
+        if (0==user.getEnable()) {
+            throw new LockedAccountException(); // 帐号锁定
         }
-        SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo(user.getId(), user.getPassword(), ByteSource.Util.bytes(username), getName());
+        SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
+                user.getId(), //用户
+                user.getPassword(), //密码
+                ByteSource.Util.bytes(username),
+                getName() //realm name
+        );
+        // 把用户信息放在session里
         Session session = SecurityUtils.getSubject().getSession();
         session.setAttribute("AdminSession", user);
         session.setAttribute("AdminSessionId", user.getId());
-        return authorizationInfo;
-
+        return authenticationInfo;
     }
 }

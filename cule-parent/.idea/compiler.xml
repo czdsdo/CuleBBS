@@ -7,11 +7,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="admin" />
+        <module name="chat" />
         <module name="common" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="admin" target="8" />
+      <module name="chat" target="7" />
       <module name="common" target="7" />
       <module name="cule-parent" target="1.5" />
     </bytecodeTargetLevel>
